@@ -9,8 +9,17 @@
 #define DEVICE_NAME "cache_flush"
 #define BUFFER_SIZE 256
 
-static char kernel_buffer[BUFFER_SIZE];
+static char kernel_buffer[BUFFER_SIZE] __aligned(64); // Use 64 bytes as the cache-block size for Banana Pi K1
 static size_t data_size;
+
+static inline void do_cbo_flush(void *addr) {
+	asm volatile(
+			"cbo.flush 0(%0)"
+			:
+			: "r"(addr)
+			: "memory"
+		    );
+}
 
 // ---- open() ----
 static int cache_open(struct inode *inode, struct file *file) {
@@ -33,8 +42,14 @@ static ssize_t cache_write(struct file *file, const char __user *user_buffer, si
 		return -EFAULT;
 	data_size = count;
 
+	// start to invalidate the cache content at kernel_buffer address
 	printk(KERN_INFO "cache_flush: recieved %zu bytes\n", count);
 
+	printk(KERN_INFO "cache_flush: ececuting cbo.flush on %px\n");
+
+	do_cbo_flush(kernel_buffer);
+
+	printk(KERN_INFO "cache_flush: cbo.flush completed\n");
 	return count;
 }
 
