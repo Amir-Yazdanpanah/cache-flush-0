@@ -1,0 +1,1 @@
+savedcmd_/root/cache-flush-0/cache-flush-0.ko := x86_64-linux-gnu-ld -r -m elf_x86_64 -z noexecstack --no-warn-rwx-segments --build-id=sha1  -T arch/x86/module.lds -o /root/cache-flush-0/cache-flush-0.ko /root/cache-flush-0/cache-flush-0.o /root/cache-flush-0/cache-flush-0.mod.o /root/cache-flush-0/.module-common.o
